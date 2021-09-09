@@ -1,0 +1,7 @@
+apiVersion: exec.example.com/v1
+kind: Executor
+metadata:
+  name: executor-sample
+spec:
+  # Add fields here
+  foo: bar
