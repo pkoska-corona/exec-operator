@@ -30,14 +30,16 @@ type ExecutorSpec struct {
 
 	// Foo is an example field of Executor. Edit executor_types.go to remove/update
 	//Foo string `json:"foo,omitempty"`
-	Replicas int32 `json:"replicas"`
+	Size     int32  `json:"replicas,omitempty"`
+	Command  string `json:"command,omitempty"`
+	Schedule string `json:"schedule,omitempty"`
 }
 
 // ExecutorStatus defines the observed state of Executor
 type ExecutorStatus struct {
 	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
-	PodNames []string `json:"podNames"`
+	Nodes []string `json:"podNames"`
 }
 
 //+kubebuilder:object:root=true
