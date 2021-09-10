@@ -58,8 +58,8 @@ func (r *ExecutorReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 	log := ctrllog.FromContext(ctx)
 
 	// Fetch the Executor instance
-	Executor := &execv1.Executor{}
-	err := r.Get(ctx, req.NamespacedName, Executor)
+	Instance := &execv1.Executor{}
+	err := r.Get(ctx, req.NamespacedName, Instance)
 	if err != nil {
 		if errors.IsNotFound(err) {
 			// Request object not found, could have been deleted after reconcile request.
@@ -75,10 +75,10 @@ func (r *ExecutorReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 
 	// Check if the deployment already exists, if not create a new one
 	found := &appsv1.Deployment{}
-	err = r.Get(ctx, types.NamespacedName{Name: Executor.Name, Namespace: Executor.Namespace}, found)
+	err = r.Get(ctx, types.NamespacedName{Name: Instance.Name, Namespace: Instance.Namespace}, found)
 	if err != nil && errors.IsNotFound(err) {
 		// Define a new deployment
-		dep := r.deploymentForExecutor(Executor)
+		dep := r.deploymentForExecutor(Instance)
 		log.Info("Creating a new Deployment", "Deployment.Namespace", dep.Namespace, "Deployment.Name", dep.Name)
 		err = r.Create(ctx, dep)
 		if err != nil {
@@ -93,7 +93,7 @@ func (r *ExecutorReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 	}
 
 	// Ensure the deployment size is the same as the spec
-	size := Executor.Spec.Size
+	size := Instance.Spec.Size
 	if *found.Spec.Replicas != size {
 		found.Spec.Replicas = &size
 		err = r.Update(ctx, found)
@@ -111,19 +111,19 @@ func (r *ExecutorReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 	// List the pods for this Executor's deployment
 	podList := &corev1.PodList{}
 	listOpts := []client.ListOption{
-		client.InNamespace(Executor.Namespace),
-		client.MatchingLabels(labelsForExecutor(Executor.Name)),
+		client.InNamespace(Instance.Namespace),
+		client.MatchingLabels(labelsForExecutor(Instance.Name)),
 	}
 	if err = r.List(ctx, podList, listOpts...); err != nil {
-		log.Error(err, "Failed to list pods", "Executor.Namespace", Executor.Namespace, "Executor.Name", Executor.Name)
+		log.Error(err, "Failed to list pods", "Instance.Namespace", Instance.Namespace, "Instance.Name", Instance.Name)
 		return ctrl.Result{}, err
 	}
 	podNames := getPodNames(podList.Items)
 
 	// Update status.Nodes if needed
-	if !reflect.DeepEqual(podNames, Executor.Status.Nodes) {
-		Executor.Status.Nodes = podNames
-		err := r.Status().Update(ctx, Executor)
+	if !reflect.DeepEqual(podNames, Instance.Status.Nodes) {
+		Instance.Status.Nodes = podNames
+		err := r.Status().Update(ctx, Instance)
 		if err != nil {
 			log.Error(err, "Failed to update Executor status")
 			return ctrl.Result{}, err
@@ -132,6 +132,8 @@ func (r *ExecutorReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 
 	return ctrl.Result{}, nil
 }
+
+func (r *ExecutorReconciler) fetchCommand() {}
 
 // deploymentForExecutor returns a Executor Deployment object
 func (r *ExecutorReconciler) deploymentForExecutor(m *execv1.Executor) *appsv1.Deployment {
@@ -154,13 +156,9 @@ func (r *ExecutorReconciler) deploymentForExecutor(m *execv1.Executor) *appsv1.D
 				},
 				Spec: corev1.PodSpec{
 					Containers: []corev1.Container{{
-						Image:   "Executor:1.4.36-alpine",
+						Image:   "busybox:stable",
 						Name:    "Executor",
-						Command: []string{"Executor", "-m=64", "-o", "modern", "-v"},
-						Ports: []corev1.ContainerPort{{
-							ContainerPort: 11211,
-							Name:          "Executor",
-						}},
+						Command: []string{"/bin/sh", "-c", "echo 'Hello, Kubernetes!' > /hello"},
 					}},
 				},
 			},
@@ -186,7 +184,7 @@ func getPodNames(pods []corev1.Pod) []string {
 	return podNames
 }
 
-func runCMDinInstances() {}
+func spawnInstanceAtSchedule() {}
 
 // SetupWithManager sets up the controller with the Manager.
 func (r *ExecutorReconciler) SetupWithManager(mgr ctrl.Manager) error {

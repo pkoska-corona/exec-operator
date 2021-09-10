@@ -4,4 +4,6 @@ metadata:
   name: executor-sample
 spec:
   # Add fields here
-  foo: bar
+  size: 3
+  command: "echo 'Hello' > /hello_from_definition"
+  schedule: "2020-11-16T10:12:00Z"
