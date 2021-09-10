@@ -133,8 +133,6 @@ func (r *ExecutorReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 	return ctrl.Result{}, nil
 }
 
-func (r *ExecutorReconciler) fetchCommand() {}
-
 // deploymentForExecutor returns a Executor Deployment object
 func (r *ExecutorReconciler) deploymentForExecutor(m *execv1.Executor) *appsv1.Deployment {
 	ls := labelsForExecutor(m.Name)
@@ -184,7 +182,9 @@ func getPodNames(pods []corev1.Pod) []string {
 	return podNames
 }
 
-func spawnInstanceAtSchedule() {}
+func spawnInstanceAndSchedule() {
+
+}
 
 // SetupWithManager sets up the controller with the Manager.
 func (r *ExecutorReconciler) SetupWithManager(mgr ctrl.Manager) error {
