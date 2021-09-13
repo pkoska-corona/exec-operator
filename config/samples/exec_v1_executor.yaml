@@ -4,6 +4,6 @@ metadata:
   name: executor-sample
 spec:
   # Add fields here
-  size: 3
+  replicas: 3
   command: "echo 'Hello' > /hello_from_resource_definition"
   schedule: "2020-11-16T10:12:00Z"

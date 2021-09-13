@@ -157,7 +157,7 @@ func (r *ExecutorReconciler) deploymentForExecutor(m *execv1.Executor) *appsv1.D
 				Spec: corev1.PodSpec{
 					Containers: []corev1.Container{{
 						Image:   "busybox:stable",
-						Name:    "Executor",
+						Name:    "executor",
 						Command: []string{"/bin/sh", "-c", m.Spec.Command},
 					}},
 				},
