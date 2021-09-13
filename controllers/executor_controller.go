@@ -44,6 +44,8 @@ type ExecutorReconciler struct {
 //+kubebuilder:rbac:groups=exec.example.com,resources=executors,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=exec.example.com,resources=executors/status,verbs=get;update;patch
 //+kubebuilder:rbac:groups=exec.example.com,resources=executors/finalizers,verbs=update
+//+kubebuilder:rbac:groups=apps,resources=deployments,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=core,resources=pods,verbs=get;list;
 
 // Reconcile is part of the main kubernetes reconciliation loop which aims to
 // move the current state of the cluster closer to the desired state.
@@ -156,7 +158,7 @@ func (r *ExecutorReconciler) deploymentForExecutor(m *execv1.Executor) *appsv1.D
 					Containers: []corev1.Container{{
 						Image:   "busybox:stable",
 						Name:    "Executor",
-						Command: []string{"/bin/sh", "-c", "echo 'Hello, Kubernetes!' > /hello"},
+						Command: []string{"/bin/sh", "-c", m.Spec.Command},
 					}},
 				},
 			},
@@ -180,10 +182,6 @@ func getPodNames(pods []corev1.Pod) []string {
 		podNames = append(podNames, pod.Name)
 	}
 	return podNames
-}
-
-func spawnInstanceAndSchedule() {
-
 }
 
 // SetupWithManager sets up the controller with the Manager.

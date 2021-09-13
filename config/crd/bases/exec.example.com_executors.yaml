@@ -36,17 +36,21 @@ spec:
           spec:
             description: ExecutorSpec defines the desired state of Executor
             properties:
+              command:
+                type: string
               replicas:
                 description: Foo is an example field of Executor. Edit executor_types.go
                   to remove/update Foo string `json:"foo,omitempty"`
                 format: int32
                 type: integer
-            required:
-            - replicas
+              schedule:
+                type: string
             type: object
           status:
             description: ExecutorStatus defines the observed state of Executor
             properties:
+              phase:
+                type: string
               podNames:
                 description: 'INSERT ADDITIONAL STATUS FIELD - define observed state
                   of cluster Important: Run "make" to regenerate code after modifying

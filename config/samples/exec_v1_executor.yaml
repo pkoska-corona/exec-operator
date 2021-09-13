@@ -5,5 +5,5 @@ metadata:
 spec:
   # Add fields here
   size: 3
-  command: "echo 'Hello' > /hello_from_definition"
+  command: "echo 'Hello' > /hello_from_resource_definition"
   schedule: "2020-11-16T10:12:00Z"
